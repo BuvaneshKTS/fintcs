@@ -1,36 +1,177 @@
-<div class="p-4">
-  <h2 class="text-2xl font-bold mb-4">Society Users</h2>
-
-  <input
-    type="text"
-    [(ngModel)]="searchTerm"
-    (input)="searchUsers()"
-    placeholder="Search users..."
-    class="border rounded px-3 py-2 w-full mb-4"
-  />
-
-  <div *ngIf="isAdmin" class="mb-4">
-    <button class="bg-blue-600 text-white px-4 py-2 rounded" (click)="createUser()">
-      + Create User
-    </button>
+<div class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <!-- Header -->
+  <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-6">
+    <div class="flex justify-between items-center">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Society Users</h1>
+      <button *ngIf="isAdmin" 
+              (click)="createUser()" 
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Create User
+      </button>
+    </div>
   </div>
 
-  <table class="table-auto w-full border">
-    <thead>
-      <tr class="bg-gray-200">
-        <th class="px-4 py-2">Username</th>
-        <th class="px-4 py-2">Email</th>
-        <th class="px-4 py-2">Role</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let user of filteredUsers"
-          (click)="openUser(user)"
-          class="cursor-pointer hover:bg-gray-100">
-        <td class="border px-4 py-2">{{ user.username }}</td>
-        <td class="border px-4 py-2">{{ user.email }}</td>
-        <td class="border px-4 py-2">{{ user.roles }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Search and Filters -->
+  <div class="p-6 bg-gray-50 dark:bg-gray-800">
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="flex-1">
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="searchUsers()"
+            placeholder="Search by username, email, or name..."
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+          />
+          <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <select [(ngModel)]="roleFilter" 
+                (change)="applyFilters()"
+                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users List -->
+  <div class="p-6">
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">Loading users...</p>
+    </div>
+
+    <div *ngIf="!isLoading && filteredUsers.length === 0" class="text-center py-12">
+      <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mt-4">No users found</h3>
+      <p class="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria.</p>
+    </div>
+
+    <!-- Desktop Table View -->
+    <div *ngIf="!isLoading && filteredUsers.length > 0" class="hidden md:block">
+      <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Designation</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr *ngFor="let user of filteredUsers" 
+                class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                      {{ user.username[0].toUpperCase() }}
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ user.details?.Name || user.username }}</div>
+                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.username }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-white">{{ user.email }}</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.phone || user.details?.Mobile }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                      [class.bg-green-100]="user.roles === 'admin'"
+                      [class.text-green-800]="user.roles === 'admin'"
+                      [class.dark:bg-green-900]="user.roles === 'admin'"
+                      [class.dark:text-green-200]="user.roles === 'admin'"
+                      [class.bg-blue-100]="user.roles === 'user'"
+                      [class.text-blue-800]="user.roles === 'user'"
+                      [class.dark:bg-blue-900]="user.roles === 'user'"
+                      [class.dark:text-blue-200]="user.roles === 'user'">
+                  {{ user.roles }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                {{ user.details?.Designation || '-' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <button (click)="viewUser(user)" 
+                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4">
+                  View
+                </button>
+                <button *ngIf="isAdmin" 
+                        (click)="editUser(user)" 
+                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4">
+                  Edit
+                </button>
+                <button *ngIf="isAdmin && user.username !== currentUsername" 
+                        (click)="deleteUser(user)" 
+                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div *ngIf="!isLoading && filteredUsers.length > 0" class="md:hidden space-y-4">
+      <div *ngFor="let user of filteredUsers" 
+           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+              {{ user.username[0].toUpperCase() }}
+            </div>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ user.details?.Name || user.username }}</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1"
+                    [class.bg-green-100]="user.roles === 'admin'"
+                    [class.text-green-800]="user.roles === 'admin'"
+                    [class.dark:bg-green-900]="user.roles === 'admin'"
+                    [class.dark:text-green-200]="user.roles === 'admin'"
+                    [class.bg-blue-100]="user.roles === 'user'"
+                    [class.text-blue-800]="user.roles === 'user'"
+                    [class.dark:bg-blue-900]="user.roles === 'user'"
+                    [class.dark:text-blue-200]="user.roles === 'user'">
+                {{ user.roles }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 flex space-x-4">
+          <button (click)="viewUser(user)" 
+                  class="flex-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900/50">
+            View
+          </button>
+          <button *ngIf="isAdmin" 
+                  (click)="editUser(user)" 
+                  class="flex-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-2 px-4 rounded-md text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50">
+            Edit
+          </button>
+          <button *ngIf="isAdmin && user.username !== currentUsername" 
+                  (click)="deleteUser(user)" 
+                  class="flex-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 py-2 px-4 rounded-md text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/50">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

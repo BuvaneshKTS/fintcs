@@ -65,7 +65,10 @@ export class SocietyUsersListComponent implements OnInit {
   users: User[] = [];
   filteredUsers: User[] = [];
   searchTerm: string = '';
+  roleFilter: string = '';
   isAdmin = false;
+  isLoading = false;
+  currentUsername = '';
 
   constructor(
     private societyUsersService: SocietyUsersService,
@@ -75,31 +78,85 @@ export class SocietyUsersListComponent implements OnInit {
 
   ngOnInit(): void {
     this.isAdmin = this.authService.isAdmin();
+    this.getCurrentUsername();
     this.loadUsers();
   }
 
+  getCurrentUsername(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUsername = user?.username || '';
+    });
+  }
+
   loadUsers(): void {
-    this.societyUsersService.getAll().subscribe(res => {
-      if (res.success) {
-        this.users = res.data;
-        this.filteredUsers = res.data;
+    this.isLoading = true;
+    this.societyUsersService.getAll().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.users = res.data;
+          this.applyFilters();
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading users:', error);
+        this.isLoading = false;
       }
     });
   }
 
   searchUsers(): void {
-    this.filteredUsers = this.users.filter(u =>
-      u.username.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+    this.applyFilters();
   }
 
-  openUser(user: User): void {
+  applyFilters(): void {
+    let filtered = this.users;
+
+    // Apply search filter
+    if (this.searchTerm) {
+      const searchLower = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(u =>
+        u.username.toLowerCase().includes(searchLower) ||
+        u.email.toLowerCase().includes(searchLower) ||
+        (u.details?.Name && u.details.Name.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Apply role filter
+    if (this.roleFilter) {
+      filtered = filtered.filter(u => u.roles === this.roleFilter);
+    }
+
+    this.filteredUsers = filtered;
+  }
+
+  viewUser(user: User): void {
     this.router.navigate(['/society-users', user.id]);
   }
 
+  editUser(user: User): void {
+    this.router.navigate(['/society-users', user.id, 'edit']);
+  }
+
   createUser(): void {
-    // Navigate to a dedicated "create user" form (can be popup or route)
     this.router.navigate(['/society-users', 'create']);
+  }
+
+  deleteUser(user: User): void {
+    if (confirm(`Are you sure you want to delete user "${user.username}"? This action cannot be undone.`)) {
+      this.societyUsersService.delete(user.id).subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.loadUsers(); // Reload the users list
+          } else {
+            alert('Failed to delete user: ' + res.message);
+          }
+        },
+        error: (error) => {
+          console.error('Error deleting user:', error);
+          alert('Failed to delete user. Please try again.');
+        }
+      });
+    }
   }
 }

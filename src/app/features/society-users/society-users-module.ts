@@ -25,6 +25,7 @@ import { SocietyUsersRoutingModule } from './society-users-routing-module';
 // ✅ Standalone components are imported, not declared
 import { SocietyUsersListComponent } from './society-users-list/society-users-list.component';
 import { SocietyUserDetailComponent } from './society-user-detail/society-users-details.component';
+import { UserFormComponent } from './user-form/user-form.component';
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import { SocietyUserDetailComponent } from './society-user-detail/society-users-
     FormsModule,
     SocietyUsersRoutingModule,
     SocietyUsersListComponent,   // ✅ imported instead of declared
-    SocietyUserDetailComponent   // ✅ imported instead of declared
+    SocietyUserDetailComponent,  // ✅ imported instead of declared
+    UserFormComponent            // ✅ imported instead of declared
   ]
 })
 export class SocietyUsersModule {}

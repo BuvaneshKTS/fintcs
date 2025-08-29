@@ -1,0 +1,103 @@
+### 1. User Registration
+
+**Endpoint:** `POST /api/auth/register`
+
+Authorization: Bearer YOUR_JWT_TOKEN_HERE (admin authorization required)
+
+**Description:** Register a new user with optional role assignment.
+
+**Request Body:**
+```json
+{
+  "username": "string (required, 3-50 characters)",
+  "password": "string (required, 6-100 characters)",
+  "email": "string (required, valid email format)",
+  "phone": "string (optional, valid phone format)",
+  "EDPNo": "string (optional)",
+  "Name": "string (optional)", 
+  "AddressOffice": "string (optional)",
+  "AddressResidential": "string (optional)",
+  "Designation": "string (optional)",
+  "PhoneOffice": "string (optional)",
+  "PhoneResidential": "string (optional)",
+  "Mobile": "string (optional)"
+}
+```
+
+**Note:** Role is automatically set to "user" for all registrations.
+
+**Success Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": 1,
+    "username": "testuser",
+    "email": "user@example.com",
+    "phone": "+1234567890",
+    "roles": "user",
+    "details": {
+      "EDPNo": "EDP001",
+      "Name": "John Doe",
+      "AddressOffice": "123 Business Center",
+      "AddressResidential": "456 Home Street",
+      "Designation": "Software Engineer",
+      "PhoneOffice": "011-12345678",
+      "PhoneResidential": "011-87654321",
+      "Mobile": "+1234567890",
+      "Email": "user@example.com"
+    },
+    "createdAt": "2025-08-26T17:25:26.793Z"
+  },
+  "errors": []
+}
+```
+
+**Failure Responses:**
+
+**400 Bad Request - User Already Exists:**
+```json
+{
+  "success": false,
+  "message": "User already exists",
+  "data": null,
+  "errors": ["Username 'testuser' is already taken"]
+}
+```
+
+**400 Bad Request - Email Already Registered:**
+```json
+{
+  "success": false,
+  "message": "Email already registered",
+  "data": null,
+  "errors": ["Email 'user@example.com' is already registered"]
+}
+```
+
+**400 Bad Request - Validation Error:**
+```json
+{
+  "success": false,
+  "message": "Invalid input data",
+  "data": null,
+  "errors": [
+    "The Username field is required.",
+    "The Password field is required.",
+    "The Email field is required."
+  ]
+}
+```
+
+**500 Internal Server Error:**
+```json
+{
+  "success": false,
+  "message": "Internal server error occurred during registration",
+  "data": null,
+  "errors": ["Detailed error message"]
+}
+```
+
+---

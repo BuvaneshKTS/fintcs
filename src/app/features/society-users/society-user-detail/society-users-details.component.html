@@ -1,16 +1,167 @@
-<div class="p-4" *ngIf="user">
-  <h2 class="text-2xl font-bold mb-4">{{ user.username }} ({{ user.roles }})</h2>
+<div class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <!-- Header -->
+  <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-6">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <button 
+          (click)="goBack()"
+          class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Users
+        </button>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">User Details</h1>
+      </div>
+      <div *ngIf="isAdmin && user" class="flex space-x-3">
+        <button 
+          (click)="editUser()" 
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Edit
+        </button>
+        <button 
+          *ngIf="user.username !== currentUsername"
+          (click)="deleteUser()" 
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <p><strong>Email:</strong> {{ user.email }}</p>
-  <p><strong>Phone:</strong> {{ user.phone }}</p>
-  <p><strong>Name:</strong> {{ user.details?.Name }}</p>
-  <p><strong>Office Address:</strong> {{ user.details?.AddressOffice }}</p>
-  <p><strong>Residential Address:</strong> {{ user.details?.AddressResidential }}</p>
-  <p><strong>Designation:</strong> {{ user.details?.Designation }}</p>
-  <p><strong>Mobile:</strong> {{ user.details?.Mobile }}</p>
+  <!-- User Details Content -->
+  <div class="p-6">
+    <div *ngIf="isLoading" class="text-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p class="mt-4 text-gray-600 dark:text-gray-400">Loading user details...</p>
+    </div>
 
-  <div *ngIf="isAdmin" class="mt-4">
-    <button class="bg-yellow-500 text-white px-4 py-2 rounded mr-2" (click)="editUser()">Edit</button>
-    <button class="bg-red-600 text-white px-4 py-2 rounded" (click)="deleteUser()">Delete</button>
+    <div *ngIf="!isLoading && !user" class="text-center py-12">
+      <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path>
+      </svg>
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mt-4">User not found</h3>
+      <p class="text-gray-600 dark:text-gray-400">The requested user could not be found.</p>
+    </div>
+
+    <div *ngIf="!isLoading && user" class="max-w-4xl mx-auto">
+      <!-- User Header -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+        <div class="flex items-center space-x-6">
+          <div class="flex-shrink-0">
+            <div class="h-20 w-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+              {{ user.username[0].toUpperCase() }}
+            </div>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ user.details?.Name || user.username }}</h2>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">{{ user.details?.Designation || 'Member' }}</p>
+            <div class="mt-2">
+              <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full"
+                    [class.bg-green-100]="user.roles === 'admin'"
+                    [class.text-green-800]="user.roles === 'admin'"
+                    [class.dark:bg-green-900]="user.roles === 'admin'"
+                    [class.dark:text-green-200]="user.roles === 'admin'"
+                    [class.bg-blue-100]="user.roles === 'user'"
+                    [class.text-blue-800]="user.roles === 'user'"
+                    [class.dark:bg-blue-900]="user.roles === 'user'"
+                    [class.dark:text-blue-200]="user.roles === 'user'">
+                {{ user.roles | titlecase }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Information Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Basic Information -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            Basic Information
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Username</label>
+              <p class="text-gray-900 dark:text-white">{{ user.username }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</label>
+              <p class="text-gray-900 dark:text-white">{{ user.details?.Name || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">EDP Number</label>
+              <p class="text-gray-900 dark:text-white">{{ user.details?.EDPNo || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Joined</label>
+              <p class="text-gray-900 dark:text-white">{{ user.createdAt | date:'mediumDate' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            Contact Information
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
+              <p class="text-gray-900 dark:text-white">{{ user.email }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Mobile</label>
+              <p class="text-gray-900 dark:text-white">{{ user.details?.Mobile || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Office Phone</label>
+              <p class="text-gray-900 dark:text-white">{{ user.details?.PhoneOffice || '-' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Residential Phone</label>
+              <p class="text-gray-900 dark:text-white">{{ user.details?.PhoneResidential || '-' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 md:col-span-2">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Address Information
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Office Address</label>
+              <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-gray-900 dark:text-white">{{ user.details?.AddressOffice || 'Not provided' }}</p>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Residential Address</label>
+              <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <p class="text-gray-900 dark:text-white">{{ user.details?.AddressResidential || 'Not provided' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
