@@ -1,0 +1,254 @@
+<!-- src/app/features/society/society-config/society-config.component.html -->
+
+<!-- Main Layout Container -->
+<div class="min-h-screen bg-gray-50 flex">
+
+  <!-- Sidebar -->
+  <div class="bg-gray-800 text-white w-64 min-h-screen p-4">
+    <!-- Logo Section -->
+    <div class="flex items-center mb-8">
+      <div class="bg-purple-600 p-2 rounded-lg mr-3">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold">FinTCS</h1>
+        <p class="text-xs text-gray-400">Financial Management</p>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="space-y-2">
+      <!-- Dashboard Section -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Dashboard</h3>
+        <a routerLink="/dashboard" class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">📊</span> <span>Overview</span>
+        </a>
+      </div>
+
+      <!-- File Management Section -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">File Management</h3>
+        <a routerLink="/society" routerLinkActive="bg-gray-700" class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">🏢</span> <span>Society</span>
+        </a>
+        <a routerLink="/members" class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">👥</span> <span>Members</span>
+        </a>
+      </div>
+
+      <!-- Security Section -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Security</h3>
+        <a *ngIf="isAdminUser" routerLink="/users" class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">👤</span> <span>New User</span>
+        </a>
+        <a *ngIf="isAdminUser" routerLink="/users" class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">🔑</span> <span>Authority</span>
+        </a>
+        <a routerLink="/users/profile" class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">⚖️</span> <span>My Rights</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Top Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-900">Society Configuration</h1>
+          <p class="text-gray-600">Manage society settings, interest rates, and limits</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <!-- Notifications -->
+          <button class="relative p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+            </svg>
+            <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+          </button>
+
+          <!-- User Profile & Logout -->
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-medium">A</span>
+              </div>
+              <span class="text-sm font-medium text-gray-700">Admin</span>
+            </div>
+            <button (click)="logout()" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Society Configuration Content -->
+    <main class="flex-1 p-6">
+      <div class="max-w-4xl mx-auto">
+
+        <!-- Pending Changes Notification -->
+        <div *ngIf="pendingChanges &&  !isAdminUser" class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
+          <p><strong>Pending Society Changes:</strong> Admin has submitted updates that need approval.</p>
+          <button (click)="approveChanges()" class="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Approve Changes
+          </button>
+        </div>
+
+        <div *ngIf="isAdminUser" class="mb-4 text-sm text-gray-600 italic">
+            <button type="button" (click)="toggleEditMode()">
+                {{ isEditMode ? 'Cancel Edit' : 'Edit' }}
+            </button>
+        </div>
+
+
+        
+
+        <!-- Mode Info -->
+        <div *ngIf="!isAdminUser" class="mb-4 text-sm text-gray-600 italic">
+          View Only Mode (You don’t have edit permissions)
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="bg-white rounded-lg shadow mb-6">
+          <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8 px-6">
+              <button (click)="setActiveTab('basic')" 
+                      [class]="activeTab === 'basic' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                      class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                Basic Information
+              </button>
+              <button (click)="setActiveTab('interest')" 
+                      [class]="activeTab === 'interest' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                      class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                Interest Rates
+              </button>
+              <button (click)="setActiveTab('limits')" 
+                      [class]="activeTab === 'limits' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                      class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                Limits
+              </button>
+            </nav>
+          </div>
+
+          <!-- Form -->
+          <form [formGroup]="societyForm" (ngSubmit)="onSubmit()" class="p-6">
+
+            <!-- Basic Information Tab -->
+            <div *ngIf="activeTab === 'basic'" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Society Name</label>
+                  <input type="text" formControlName="societyName" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter society name" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
+                  <input type="text" formControlName="registrationNumber" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter registration number" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                  <textarea formControlName="address" rows="3" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter complete address"></textarea>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+                  <input type="text" formControlName="city" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter city" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                  <input type="tel" formControlName="phone" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter phone number" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Fax</label>
+                  <input type="tel" formControlName="fax" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter fax number" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input type="email" formControlName="email" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter email address" />
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Website</label>
+                  <input type="url" formControlName="website" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="Enter website URL" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Interest Rates Tab -->
+            <div *ngIf="activeTab === 'interest'" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Dividend Rate (%)</label>
+                  <input type="number" step="0.01" formControlName="dividendRate" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">OD Rate (%)</label>
+                  <input type="number" step="0.01" formControlName="odRate" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">CD Rate (%)</label>
+                  <input type="number" step="0.01" formControlName="cdRate" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Loan Rate (%)</label>
+                  <input type="number" step="0.01" formControlName="loanRate" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Emergency Loan Rate (%)</label>
+                  <input type="number" step="0.01" formControlName="emergencyLoanRate" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">LAS Rate (%)</label>
+                  <input type="number" step="0.01" formControlName="lasRate" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0.00" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Limits Tab -->
+            <div *ngIf="activeTab === 'limits'" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Share Limit (₹)</label>
+                  <input type="number" formControlName="shareLimit" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Loan Limit (₹)</label>
+                  <input type="number" formControlName="loanLimit" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Emergency Loan Limit (₹)</label>
+                  <input type="number" formControlName="emergencyLoanLimit" [disabled]="!isAdminUser || !isEditMode" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="0" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button only for admin -->
+            <div class="flex justify-end pt-6 border-t border-gray-200 mt-6">
+              <button *ngIf="isAdminUser && isEditMode" type="submit" 
+        [disabled]="!societyForm.valid || isLoading"
+        class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+  <span *ngIf="!isLoading">Save Configuration</span>
+  <span *ngIf="isLoading" class="flex items-center">
+    <svg class="animate-spin -ml-1 mr-3 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Saving...
+  </span>
+</button>
+
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

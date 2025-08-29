@@ -1,0 +1,16 @@
+<div class="p-4" *ngIf="user">
+  <h2 class="text-2xl font-bold mb-4">{{ user.username }} ({{ user.roles }})</h2>
+
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Phone:</strong> {{ user.phone }}</p>
+  <p><strong>Name:</strong> {{ user.details?.Name }}</p>
+  <p><strong>Office Address:</strong> {{ user.details?.AddressOffice }}</p>
+  <p><strong>Residential Address:</strong> {{ user.details?.AddressResidential }}</p>
+  <p><strong>Designation:</strong> {{ user.details?.Designation }}</p>
+  <p><strong>Mobile:</strong> {{ user.details?.Mobile }}</p>
+
+  <div *ngIf="isAdmin" class="mt-4">
+    <button class="bg-yellow-500 text-white px-4 py-2 rounded mr-2" (click)="editUser()">Edit</button>
+    <button class="bg-red-600 text-white px-4 py-2 rounded" (click)="deleteUser()">Delete</button>
+  </div>
+</div>

@@ -1,0 +1,265 @@
+<!-- Main Layout Container -->
+<div class="min-h-screen bg-gray-50 flex">
+  <!-- Sidebar -->
+  <div class="bg-gray-800 text-white w-64 min-h-screen p-4">
+    <!-- Logo Section -->
+    <div class="flex items-center mb-8">
+      <div class="bg-purple-600 p-2 rounded-lg mr-3">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold">FinTCS</h1>
+        <p class="text-xs text-gray-400">Financial Management</p>
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="space-y-2">
+      <!-- Dashboard Section -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Dashboard</h3>
+        <a routerLink="/dashboard" routerLinkActive="bg-gray-700" 
+           class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">📊</span>
+          <span>Overview</span>
+        </a>
+      </div>
+
+      <!-- File Management Section -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">File Management</h3>
+        <a routerLink="/society" routerLinkActive="bg-gray-700"
+           class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">🏢</span>
+          <span>Society</span>
+        </a>
+        <a routerLink="/members" routerLinkActive="bg-gray-700"
+           class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">👥</span>
+          <span>Members</span>
+        </a>
+      </div>
+
+      <!-- Security Section -->
+      <div class="mb-6">
+        <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Security</h3>
+        <a *ngIf="isAdmin()" routerLink="/society-users" routerLinkActive="bg-gray-700"
+           class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">👤</span>
+          <span>New User</span>
+        </a>
+        <a *ngIf="isAdmin()" routerLink="/users" routerLinkActive="bg-gray-700"
+           class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">🔑</span>
+          <span>Authority</span>
+        </a>
+        <a routerLink="/users/profile" routerLinkActive="bg-gray-700"
+           class="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors">
+          <span class="mr-3">⚖️</span>
+          <span>My Rights</span>
+        </a>
+        <button (click)="logout()"
+                class="w-full flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors text-left">
+          <span class="mr-3">🔓</span>
+          <span>Change Password</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Top Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <button class="text-gray-500 hover:text-gray-700 lg:hidden">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- Dark Mode Toggle -->
+          <button class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+            </svg>
+          </button>
+          
+          <!-- Notifications -->
+          <button class="relative p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+            </svg>
+            <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+          </button>
+          
+          <!-- User Profile & Logout -->
+          <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                <span class="text-white text-sm font-medium">
+                  {{ currentUser?.username?.charAt(0)?.toUpperCase() || 'U' }}
+                </span>
+              </div>
+              <span class="text-sm font-medium text-gray-700">
+                {{ currentUser?.username || 'User' }}
+              </span>
+            </div>
+            
+            <!-- Logout Button -->
+            <button
+              (click)="logout()"
+              class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <main class="flex-1 p-6">
+      <!-- Welcome Section -->
+      <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 mb-6 text-white">
+        <div class="flex justify-between items-center">
+          <div>
+            <h1 class="text-2xl font-bold mb-2">Welcome to FinTCS Dashboard</h1>
+            <p class="text-purple-100">Manage your financial data with elegance and efficiency</p>
+          </div>
+          <div class="hidden md:block">
+            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+              <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Members -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span class="text-blue-600 text-xl">👥</span>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-gray-500">Total Members</p>
+              <div class="flex items-baseline">
+                <p class="text-2xl font-semibold text-gray-900">{{ stats.totalMembers.value | number }}</p>
+                <p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <span>+{{ stats.totalMembers.growth }}%</span>
+                  <span class="text-gray-500 ml-1">this month</span>
+                </p>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Active members in system</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Deposits -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                <span class="text-green-600 text-xl">💰</span>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-gray-500">Total Deposits</p>
+              <div class="flex items-baseline">
+                <p class="text-2xl font-semibold text-gray-900">₹{{ stats.totalDeposits.value }}M</p>
+                <p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <span>+{{ stats.totalDeposits.growth }}%</span>
+                  <span class="text-gray-500 ml-1">this month</span>
+                </p>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Total deposits amount</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Loans -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <span class="text-orange-600 text-xl">📄</span>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-gray-500">Active Loans</p>
+              <div class="flex items-baseline">
+                <p class="text-2xl font-semibold text-gray-900">{{ stats.activeLoans.value }}</p>
+                <p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <span>+{{ stats.activeLoans.growth }}%</span>
+                  <span class="text-gray-500 ml-1">this month</span>
+                </p>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Currently active loans</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interest Earned -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <span class="text-purple-600 text-xl">📈</span>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-gray-500">Interest Earned</p>
+              <div class="flex items-baseline">
+                <p class="text-2xl font-semibold text-gray-900">₹{{ stats.interestEarned.value }}M</p>
+                <p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                  <span>+{{ stats.interestEarned.growth }}%</span>
+                  <span class="text-gray-500 ml-1">this month</span>
+                </p>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Total interest earned</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex items-center mb-6">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+            <span class="text-green-600 text-xl">⚡</span>
+          </div>
+          <h2 class="text-lg font-semibold text-gray-900">Quick Actions</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <button *ngFor="let action of quickActions"
+                  class="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 transition-colors group">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-4"
+                   [ngClass]="action.color">
+                <span class="text-white text-xl">{{ action.icon }}</span>
+              </div>
+              <div class="text-left">
+                <p class="font-medium text-gray-900 group-hover:text-gray-700">{{ action.title }}</p>
+                <p class="text-sm text-gray-500">{{ action.subtitle }}</p>
+              </div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
