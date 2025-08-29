@@ -1,18 +1,26 @@
-<div class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-  <!-- Header -->
-  <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-6">
-    <div class="flex justify-between items-center">
-      <div class="flex items-center space-x-4">
-        <button 
-          (click)="goBack()"
-          class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-          Back to Users
-        </button>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">User Details</h1>
-      </div>
+<!-- Main Layout Container -->
+<div class="min-h-screen bg-gray-50 flex">
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200 p-6">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-4">
+          <button 
+            (click)="goBack()"
+            class="text-blue-600 hover:text-blue-800 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back to Users
+          </button>
+          <div>
+            <h1 class="text-2xl font-semibold text-gray-900">User Details</h1>
+            <p class="text-gray-600">View user information and details</p>
+          </div>
+        </div>
       <div *ngIf="isAdmin && user" class="flex space-x-3">
         <button 
           (click)="editUser()" 
@@ -33,24 +41,23 @@
         </button>
       </div>
     </div>
-  </div>
 
-  <!-- User Details Content -->
-  <div class="p-6">
-    <div *ngIf="isLoading" class="text-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-      <p class="mt-4 text-gray-600 dark:text-gray-400">Loading user details...</p>
-    </div>
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6">
+      <div *ngIf="isLoading" class="text-center py-8">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p class="mt-4 text-gray-600">Loading user details...</p>
+      </div>
 
-    <div *ngIf="!isLoading && !user" class="text-center py-12">
-      <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path>
-      </svg>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mt-4">User not found</h3>
-      <p class="text-gray-600 dark:text-gray-400">The requested user could not be found.</p>
-    </div>
+      <div *ngIf="!isLoading && !user" class="text-center py-12">
+        <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mt-4">User not found</h3>
+        <p class="text-gray-600">The requested user could not be found.</p>
+      </div>
 
-    <div *ngIf="!isLoading && user" class="max-w-4xl mx-auto">
+      <div *ngIf="!isLoading && user" class="max-w-4xl mx-auto">
       <!-- User Header -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
         <div class="flex items-center space-x-6">
@@ -162,6 +169,7 @@
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </main>
   </div>
 </div>

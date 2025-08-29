@@ -54,11 +54,12 @@ import { Router } from '@angular/router';
 import { SocietyUsersService } from '../society-users.service';
 import { User } from '../../../shared/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-society-users-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SidebarComponent],
   templateUrl: './society-users-list.component.html'
 })
 export class SocietyUsersListComponent implements OnInit {

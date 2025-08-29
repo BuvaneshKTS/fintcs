@@ -5,11 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SocietyUsersService } from '../society-users.service';
 import { User, RegisterRequest } from '../../../shared/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SidebarComponent],
   templateUrl: './user-form.component.html'
 })
 export class UserFormComponent implements OnInit {
@@ -84,6 +85,9 @@ export class UserFormComponent implements OnInit {
   populateForm(): void {
     if (!this.user) return;
 
+    // Create a new form with proper validation for edit mode
+    this.userForm = this.createForm();
+    
     this.userForm.patchValue({
       username: this.user.username,
       email: this.user.email,

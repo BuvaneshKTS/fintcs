@@ -51,11 +51,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SocietyUsersService } from '../society-users.service';
 import { User } from '../../../shared/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-society-user-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SidebarComponent],
   templateUrl: './society-users-details.component.html'
 })
 export class SocietyUserDetailComponent implements OnInit {
